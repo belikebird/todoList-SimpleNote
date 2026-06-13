@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ThemeModeVue from '../../../components/ThemeMode.vue';
 import type { NoteItem } from '../../../composables/useNotes'
 import { getNoteTitle, NOTE_COLOR_MAP } from '../../../composables/useNotes'
 
@@ -50,6 +51,7 @@ function handleClose(event: Event, id: string) {
         />
       </svg>
     </button>
+    <ThemeModeVue/>
   </div>
 </template>
 
