@@ -9,7 +9,7 @@
           <span class="divider">·</span>
           <span class="finished-label">{{ finishedCount }} 已完成</span>
         </p>
-        <button class="theme-toggle" @click="toggleThemePanel" title="主题设置">
+        <button class="theme-toggle" @click="toggleMode()" title="主题设置">
           <svg viewBox="0 0 24 24" width="18" height="18">
             <path
               v-if="theme.mode === 'light'"
@@ -25,66 +25,6 @@
         </button>
       </div>
     </header>
-
-    <!-- 主题切换面板 -->
-    <transition name="panel">
-      <div v-if="showThemePanel" class="theme-panel">
-        <div class="panel-section">
-          <span class="section-label">模式</span>
-          <div class="mode-options">
-            <button
-              :class="['mode-btn', { active: theme.mode === 'light' }]"
-              @click="setMode('light')"
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16">
-                <path
-                  fill="currentColor"
-                  d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"
-                />
-              </svg>
-              日间
-            </button>
-            <button
-              :class="['mode-btn', { active: theme.mode === 'dark' }]"
-              @click="setMode('dark')"
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16">
-                <path
-                  fill="currentColor"
-                  d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"
-                />
-              </svg>
-              夜间
-            </button>
-          </div>
-        </div>
-        <div class="panel-section">
-          <span class="section-label">主题色</span>
-          <div class="accent-options">
-            <button
-              v-for="a in accents"
-              :key="a"
-              :class="['accent-btn', { active: theme.accent === a }]"
-              :style="{ '--c': accentColor(a) }"
-              @click="setAccent(a)"
-              :title="accentName(a)"
-            >
-              <svg
-                v-if="theme.accent === a"
-                viewBox="0 0 24 24"
-                width="12"
-                height="12"
-              >
-                <path
-                  fill="#fff"
-                  d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </transition>
 
     <!-- 列表区域 -->
     <div class="list-area">
@@ -142,40 +82,14 @@ import draggable from "vuedraggable";
 import confetti from "canvas-confetti";
 import TodoItemComp from "./components/todoItem.vue";
 import { useTodos } from "../../composables/useTodos";
-import { useTheme, type ThemeAccent } from "../../composables/useTheme";
+import { useTheme } from "../../composables/useTheme";
 
 const { todoItems, addTodo, deleteTodo, toggleTodo, editTodo, loadTodos } =
   useTodos();
-const { theme, setMode, setAccent } = useTheme();
+const { theme, toggleMode } = useTheme();
 
 const inputText = ref("");
 const inputRef = ref<HTMLInputElement | null>(null);
-const showThemePanel = ref(false);
-
-const accents: ThemeAccent[] = ["blue", "green", "purple", "orange"];
-const accentNames: Record<ThemeAccent, string> = {
-  blue: "蓝",
-  green: "绿",
-  purple: "紫",
-  orange: "橙",
-};
-const accentValues: Record<ThemeAccent, string> = {
-  blue: "#4a90d9",
-  green: "#52c41a",
-  purple: "#7c4dff",
-  orange: "#ff9f43",
-};
-
-function accentName(a: ThemeAccent) {
-  return accentNames[a];
-}
-function accentColor(a: ThemeAccent) {
-  return accentValues[a];
-}
-
-function toggleThemePanel() {
-  showThemePanel.value = !showThemePanel.value;
-}
 
 // ─── 统计 ───
 const pendingCount = computed(

@@ -1,18 +1,15 @@
 import { ref, watch } from 'vue'
 
 export type ThemeMode = 'light' | 'dark'
-export type ThemeAccent = 'blue' | 'green' | 'purple' | 'orange'
 
 export interface ThemeConfig {
   mode: ThemeMode
-  accent: ThemeAccent
 }
 
 const STORAGE_KEY = 'todo-theme'
 
 const defaultTheme: ThemeConfig = {
   mode: 'light',
-  accent: 'blue',
 }
 
 function loadTheme(): ThemeConfig {
@@ -20,7 +17,7 @@ function loadTheme(): ThemeConfig {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw) as ThemeConfig
-      if (parsed.mode && parsed.accent) return parsed
+      if (parsed.mode) return parsed
     }
   } catch {}
   return { ...defaultTheme }
@@ -35,7 +32,6 @@ const theme = ref<ThemeConfig>(loadTheme())
 function applyTheme(t: ThemeConfig) {
   const root = document.documentElement
   root.setAttribute('data-mode', t.mode)
-  root.setAttribute('data-accent', t.accent)
 }
 
 // 同步到 DOM
@@ -47,11 +43,6 @@ export function useTheme() {
     saveTheme(theme.value)
   }
 
-  function setAccent(accent: ThemeAccent) {
-    theme.value = { ...theme.value, accent }
-    saveTheme(theme.value)
-  }
-
   function toggleMode() {
     setMode(theme.value.mode === 'light' ? 'dark' : 'light')
   }
@@ -59,7 +50,6 @@ export function useTheme() {
   return {
     theme,
     setMode,
-    setAccent,
     toggleMode,
   }
 }

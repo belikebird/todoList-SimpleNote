@@ -16,7 +16,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   ? path.join(process.env.APP_ROOT, "public")
   : RENDERER_DIST;
 
-// ─── 数据持久化：将 todo 以 JSON 存储在用户数据目录 ───
+// ─── todoList数据持久化：将 todo 以 JSON 存储在用户数据目录 ───
 function getTodosFilePath() {
   return path.join(app.getPath("userData"), "todos.json");
 }
