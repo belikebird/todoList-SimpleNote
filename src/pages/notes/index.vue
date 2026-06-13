@@ -35,21 +35,28 @@ function selectNote(id: string) {
 function handleAdd() {
   const newNote = addNote();
   selectedNoteId.value = newNote.id;
+  showNotesId.value.push(newNote.id);
 }
 
-// ─── 删除便签 ───
-function handleClose(id: string) {
-  const idx = notes.value.findIndex((n) => n.id === id);
+function handleDelete(id: string) {
+  if (!notes.value.some(note => note.id == id)) return
   deleteNote(id);
+}
+
+// ─── 移除展示的便签 ───
+function handleClose(id: string) {
+  const idx = showNotesId.value.findIndex((noteId) => noteId === id);
+  removeShowNote(id);
 
   // 智能切换：如果删除的是当前选中，优先选后一个，否则前一个，否则 null
   if (selectedNoteId.value === id) {
-    if (notes.value.length === 0) {
+    if (showNotesId.value.length === 0) {
       selectedNoteId.value = null;
     } else {
       // 优先选后一个（idx 是删除前的位置）
-      const next = notes.value[Math.min(idx, notes.value.length - 1)];
-      selectedNoteId.value = next?.id ?? null;
+      const targetId = showNotesId.value[Math.min(idx, showNotesId.value.length - 1)]
+      const nextNote = notes.value.find(note => note.id == targetId);
+      selectedNoteId.value = nextNote?.id ?? null;
     }
   }
 }
@@ -57,6 +64,7 @@ function handleClose(id: string) {
 // ─── 添加TabBar显示的便签 ───
 function handleAddShowNote(id: string) {
   addShowNote(id)
+  selectedNoteId.value = id;
 }
 
 // ─── 移除TabBar显示的便签 ───
@@ -105,17 +113,16 @@ onUnmounted(() => {
       :selected-note-id="selectedNoteId"
       :show-notes-id="showNotesId"
       @select="selectNote"
-      @close="handleClose"
+      @closeShowNote="handleClose"
     />
 
     <!-- 主内容区：侧边栏 + 编辑器 -->
     <div class="notes-content">
       <NoteSidebar
         :notes="notes"
-        :selected-note-id="selectedNoteId"
         :show-notes-id="showNotesId"
-        @select="selectNote"
         @add="handleAdd"
+        @delete="handleDelete"
         @add-show-note="handleAddShowNote"
         @remove-show-note="handleRemoveShowNote"
       />

@@ -12,7 +12,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   select: [id: string];
-  close: [id: string];
+  closeShowNote: [id: string];
 }>();
 
 const getShowNotes = computed(() => {
@@ -25,7 +25,7 @@ const getShowNotes = computed(() => {
 // 防止关闭事件冒泡到 select
 function handleClose(event: Event, id: string) {
   event.stopPropagation();
-  emit("close", id);
+  emit("closeShowNote", id);
 }
 </script>
 

@@ -13,7 +13,6 @@ export type ShowNoteItems = string[];
 
 export const NOTE_COLORS: NoteColor[] = ['yellow', 'pink', 'blue', 'green', 'purple', 'orange']
 export const DEFAULT_NOTE_COLOR: NoteColor = 'yellow'
-
 export const NOTE_COLOR_MAP: Record<NoteColor, string> = {
   yellow: '#fff9c4',
   pink: '#f8bbd0',
@@ -84,7 +83,6 @@ watch(notes, () => {
 
 watch(showNotesId, () => {
   if (initialized) scheduleShowSave()
-    console.log(showNotesId.value);
 }, { deep: true })
 
 export function useNotes() {

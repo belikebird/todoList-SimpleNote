@@ -9,13 +9,12 @@ import {
 
 const props = defineProps<{
   notes: NoteItem[];
-  selectedNoteId: string | null;
   showNotesId: string[];
 }>();
 
 const emit = defineEmits<{
-  select: [id: string];
   add: [];
+  delete: [id: string];
   addShowNote: [id: string];
   removeShowNote: [id: string];
 }>();
@@ -27,8 +26,8 @@ const sortedNotes = computed(() =>
 
 // 处理便签点击事件：移除/增加TabBar展示Note
 function handleClick(id: string) {
-  const isInShowNotes = props.showNotesId.some((noteId) => noteId == id)
-  isInShowNotes ? emit("removeShowNote", id) : emit("addShowNote", id)
+  const isInShowNotes = props.showNotesId.some((noteId) => noteId == id);
+  isInShowNotes ? emit("removeShowNote", id) : emit("addShowNote", id);
 }
 </script>
 
@@ -70,6 +69,25 @@ function handleClick(id: string) {
           <p class="note-title">{{ getNoteTitle(note.content) }}</p>
           <p class="note-time">{{ getRelativeTime(note.updatedAt) }}</p>
         </div>
+        <!-- 删除便签按钮 -->
+        <button @click="emit('delete', note.id)" class="delete-btn">
+          <svg
+            t="1781310567117"
+            class="icon"
+            viewBox="0 0 1024 1024"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            p-id="1659"
+            width="200"
+            height="200"
+          >
+            <path
+              d="M512 557.223994l249.203712 249.203712c12.491499 12.491499 32.730449 12.489452 45.221948-0.002047s12.493545-32.730449 0.002047-45.221948L557.223994 512l249.203712-249.203712c12.491499-12.491499 12.489452-32.730449-0.002047-45.221948s-32.730449-12.493545-45.221948-0.002047L512 466.776006 262.796288 217.572294c-12.491499-12.491499-32.729425-12.490475-45.220924 0.001023-6.246261 6.246261-9.370415 14.429641-9.370415 22.610974s3.121084 16.365736 9.367345 22.610974L466.774983 512 217.572294 761.203712c-6.246261 6.246261-9.367345 14.428617-9.367345 22.610974s3.125177 16.365736 9.370415 22.610974c12.491499 12.491499 32.729425 12.493545 45.220924 0.002047L512 557.223994z"
+              fill="#cecece"
+              p-id="1660"
+            ></path>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -202,6 +220,35 @@ function handleClick(id: string) {
 .note-time {
   margin: 3px 0 0;
   font-size: 11px;
-  color: var(--text-disabled);
+  color: var(--text-secondary);
+}
+
+.delete-btn {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+  opacity: 0;
+
+  svg {
+    width: fit-content;
+    height: fit-content;
+  }
+
+  &:hover {
+    opacity: 1;
+    & svg path {
+      fill: var(--danger);
+    }
+  }
 }
 </style>
