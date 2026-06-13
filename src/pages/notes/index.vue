@@ -21,9 +21,13 @@ const {
 const selectedNoteId = ref<string | null>(null);
 
 // 当前选中的便签
+// TODO: 1. 第一次打开便签时无内容显示BUG。2. 删除便签无效BUG。
 const selectedNote = computed<NoteItem | null>(() => {
   if (!selectedNoteId.value) return null;
-  return notes.value.find((n) => n.id === selectedNoteId.value) ?? null;
+  const res = notes.value.find((n) => n.id === selectedNoteId.value) ?? null;
+  console.log(res);
+  
+  return res
 });
 
 // ─── 选择便签 ───

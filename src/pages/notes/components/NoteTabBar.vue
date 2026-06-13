@@ -50,30 +50,43 @@ function handleClose(event: Event, id: string) {
         </button>
       </div>
     </div>
-    <ThemeModeVue />
+    <ThemeModeVue class="theme"/>
   </div>
 </template>
 
 <style scoped lang="scss">
 .note-tab-bar {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: end;
   gap: 0;
-  height: 42px;
+  height: 50px;
   min-height: 42px;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
   padding-right: 8px;
+  // padding-top: 25px;
+  padding-bottom: 0;
   flex-shrink: 0;
+  overflow-y: visible;
+}
+
+.theme {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
 }
 
 .tab-list {
   display: flex;
-  align-items: stretch;
+  align-items: end;
+  height: 100%;
   gap: 2px;
   overflow-x: auto;
   flex: 1;
-  padding: 4px 4px 4px 8px;
+  padding: 4px 4px 0px 8px;
 
   &::-webkit-scrollbar {
     height: 3px;
@@ -87,7 +100,7 @@ function handleClose(event: Event, id: string) {
   padding: 0 5px 0 10px;
   min-width: 80px;
   max-width: 160px;
-  min-height: 28px;
+  height: 30px;
   border-radius: 8px 8px 0 0;
   background: var(--tab-color);
   cursor: pointer;
@@ -106,7 +119,9 @@ function handleClose(event: Event, id: string) {
     // border-color: color-mix(in srgb, var(--tab-color) 60%, transparent);
     // border-bottom-color: transparent;
     z-index: 1;
-    margin-top: -5px;
+    // margin-top: -10px;
+    // transform: scaleY(1.5);
+    height: 38px;
   }
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import type { NoteColor, NoteItem } from '../../../composables/useNotes'
 import { NOTE_COLORS, NOTE_COLOR_MAP } from '../../../composables/useNotes'
 
@@ -12,7 +12,7 @@ const emit = defineEmits<{
   changeColor: [id: string, color: NoteColor]
 }>()
 
-const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const editorRef = ref<HTMLTextAreaElement | null>(null)
 
 // 当前选中便签的颜色值（用于编辑器背景色调）
 const noteBgColor = computed(() => {
@@ -37,23 +37,56 @@ const lastUpdated = computed(() => {
   return `${date.getMonth() + 1}/${date.getDate()} 保存`
 })
 
-function handleInput(event: Event) {
-  if (!props.note) return
-  const target = event.target as HTMLDivElement
-  emit('update', props.note.id, target.innerText)
-}
+// function handleInput(event: Event) {
+//   if (!props.note) return
+//   const target = event.target as HTMLDivElement
+//   emit('update', props.note.id, target.innerText)
+// }
 
 function handleColorChange(color: NoteColor) {
   if (!props.note) return
   emit('changeColor', props.note.id, color)
 }
 
+
+let isEditing = false;
+
+// 处理编辑栏
+function handleInput(){
+  if (!editorRef.value || !props.note) return
+
+  isEditing = true
+  const newContent = editorRef.value.innerText
+  emit("update", props.note.id, newContent)  // 同步到父组件
+}
+
+const handleBlur = () => {
+  isEditing = false
+}
+
+onMounted(() => {
+  if (editorRef.value && props.note && props.note.content) {
+    editorRef.value.innerText = props.note.content
+  }
+  console.log('dwdwdw');
+})
+
+watch(() => props.note, (newNote) => {
+  // 如果用户正在编辑，不覆盖内容
+  if (isEditing) return
+
+  const newVal = newNote?.content
+  if (editorRef.value && newVal !== undefined && editorRef.value.innerText !== newVal) {
+    editorRef.value.innerText = newVal
+  }
+})
+
 // 切换便签时自动聚焦
 watch(
   () => props.note?.id,
   () => {
     nextTick(() => {
-      textareaRef.value?.focus()
+      editorRef.value?.focus()
     })
   },
 )
@@ -91,11 +124,12 @@ watch(
 
       <!-- 文本编辑区 -->
       <div 
+      ref="editorRef"
       class="editable" 
       contenteditable="true" 
       data-placeholder="请输入内容..."
       @input="handleInput"
-      v-text="note.content"
+      @blur="handleBlur"
       ></div>
 
       <!-- 底部状态栏 -->
