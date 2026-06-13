@@ -13,7 +13,6 @@ const emit = defineEmits<{
 }>()
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
-const content = ref('')
 
 // 当前选中便签的颜色值（用于编辑器背景色调）
 const noteBgColor = computed(() => {
@@ -98,14 +97,6 @@ watch(
       @input="handleInput"
       v-text="note.content"
       ></div>
-
-      <!-- <textarea
-        ref="textareaRef"
-        :value="note.content"
-        class="editor-textarea"
-        placeholder="在此输入便签内容…"
-        @input="handleInput"
-      /> -->
 
       <!-- 底部状态栏 -->
       <div class="editor-status">
@@ -207,27 +198,6 @@ watch(
 }
 
 // ─── 文本编辑区 ───
-/* .editor-textarea {
-  flex: 1;
-  min-height: 0;
-  padding: 16px;
-  border: none;
-  outline: none;
-  resize: none;
-  font-size: 15px;
-  line-height: 1.7;
-  font-family: inherit;
-  color: var(--text-primary);
-  background: transparent;
-  white-space: pre-wrap;
-  word-break: break-word;
-  transition: background 0.2s;
-
-  &::placeholder {
-    color: var(--text-disabled);
-  }
- }*/
-
 .editable {
   flex: 1;
   min-height: 0;
