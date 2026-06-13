@@ -54,6 +54,30 @@ ipcMain.handle("save-notes", (_event, json) => {
     return false;
   }
 });
+function getShowNotesIdFilePath() {
+  return path.join(app.getPath("userData"), "showNotesId.json");
+}
+ipcMain.handle("load-show-notesId", () => {
+  try {
+    const filePath = getShowNotesIdFilePath();
+    if (fs.existsSync(filePath)) {
+      return fs.readFileSync(filePath, "utf-8");
+    }
+  } catch (err) {
+    console.error("[load-show-notesId]", err);
+  }
+  return null;
+});
+ipcMain.handle("save-show-notesId", (_event, json) => {
+  try {
+    const filePath = getShowNotesIdFilePath();
+    fs.writeFileSync(filePath, json, "utf-8");
+    return true;
+  } catch (err) {
+    console.error("[save-show-notesId]", err);
+    return false;
+  }
+});
 let win;
 function createWindow() {
   win = new BrowserWindow({

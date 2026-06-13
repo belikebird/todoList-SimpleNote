@@ -1,23 +1,31 @@
 <script setup lang="ts">
-import ThemeModeVue from '../../../components/ThemeMode.vue';
-import type { NoteItem } from '../../../composables/useNotes'
-import { getNoteTitle, NOTE_COLOR_MAP } from '../../../composables/useNotes'
+import { computed } from "vue";
+import ThemeModeVue from "../../../components/ThemeMode.vue";
+import type { NoteItem } from "../../../composables/useNotes";
+import { getNoteTitle, NOTE_COLOR_MAP } from "../../../composables/useNotes";
 
-defineProps<{
-  notes: NoteItem[]
-  selectedNoteId: string | null
-}>()
+const props = defineProps<{
+  notes: NoteItem[];
+  selectedNoteId: string | null;
+  showNotesId: string[];
+}>();
 
 const emit = defineEmits<{
-  select: [id: string]
-  close: [id: string]
-  add: []
-}>()
+  select: [id: string];
+  close: [id: string];
+}>();
+
+const getShowNotes = computed(() => {
+  return props.showNotesId.flatMap((id) => {
+    const note = props.notes.find((note) => note.id === id);
+    return note ? [note] : [];
+  });
+});
 
 // 防止关闭事件冒泡到 select
 function handleClose(event: Event, id: string) {
-  event.stopPropagation()
-  emit('close', id)
+  event.stopPropagation();
+  emit("close", id);
 }
 </script>
 
@@ -25,7 +33,7 @@ function handleClose(event: Event, id: string) {
   <div class="note-tab-bar">
     <div class="tab-list">
       <div
-        v-for="note in notes"
+        v-for="note in getShowNotes"
         :key="note.id"
         :class="['note-tab', { active: note.id === selectedNoteId }]"
         :style="{ '--tab-color': NOTE_COLOR_MAP[note.color] }"
@@ -42,16 +50,7 @@ function handleClose(event: Event, id: string) {
         </button>
       </div>
     </div>
-
-    <button class="tab-add" @click="emit('add')" title="新建便签 (Ctrl+N)">
-      <svg viewBox="0 0 24 24" width="18" height="18">
-        <path
-          fill="currentColor"
-          d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
-        />
-      </svg>
-    </button>
-    <ThemeModeVue/>
+    <ThemeModeVue />
   </div>
 </template>
 
@@ -138,32 +137,6 @@ function handleClose(event: Event, id: string) {
   &:hover {
     background: rgba(0, 0, 0, 0.12);
     color: rgba(0, 0, 0, 0.7);
-  }
-}
-
-.tab-add {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.2s;
-  margin-left: 4px;
-
-  &:hover {
-    background: var(--accent-light);
-    color: var(--accent);
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
   }
 }
 </style>

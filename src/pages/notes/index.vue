@@ -1,78 +1,100 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import { useNotes, type NoteItem } from '../../composables/useNotes'
-import NoteTabBar from './components/NoteTabBar.vue'
-import NoteSidebar from './components/NoteSidebar.vue'
-import NoteEditor from './components/NoteEditor.vue'
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import { useNotes, type NoteItem } from "../../composables/useNotes";
+import NoteTabBar from "./components/NoteTabBar.vue";
+import NoteSidebar from "./components/NoteSidebar.vue";
+import NoteEditor from "./components/NoteEditor.vue";
 
-const { notes, addNote, deleteNote, updateNoteContent, setNoteColor, loadNotes } = useNotes()
+const {
+  notes,
+  showNotesId,
+  addNote,
+  deleteNote,
+  updateNoteContent,
+  setNoteColor,
+  loadNotes,
+  addShowNote,
+  removeShowNote,
+  loadShowNotes
+} = useNotes();
 
-const selectedNoteId = ref<string | null>(null)
+const selectedNoteId = ref<string | null>(null);
 
 // 当前选中的便签
 const selectedNote = computed<NoteItem | null>(() => {
-  if (!selectedNoteId.value) return null
-  return notes.value.find((n) => n.id === selectedNoteId.value) ?? null
-})
+  if (!selectedNoteId.value) return null;
+  return notes.value.find((n) => n.id === selectedNoteId.value) ?? null;
+});
 
 // ─── 选择便签 ───
 function selectNote(id: string) {
-  selectedNoteId.value = id
+  selectedNoteId.value = id;
 }
 
 // ─── 新建便签 ───
 function handleAdd() {
-  const newNote = addNote()
-  selectedNoteId.value = newNote.id
+  const newNote = addNote();
+  selectedNoteId.value = newNote.id;
 }
 
 // ─── 删除便签 ───
 function handleClose(id: string) {
-  const idx = notes.value.findIndex((n) => n.id === id)
-  deleteNote(id)
+  const idx = notes.value.findIndex((n) => n.id === id);
+  deleteNote(id);
 
   // 智能切换：如果删除的是当前选中，优先选后一个，否则前一个，否则 null
   if (selectedNoteId.value === id) {
     if (notes.value.length === 0) {
-      selectedNoteId.value = null
+      selectedNoteId.value = null;
     } else {
       // 优先选后一个（idx 是删除前的位置）
-      const next = notes.value[Math.min(idx, notes.value.length - 1)]
-      selectedNoteId.value = next?.id ?? null
+      const next = notes.value[Math.min(idx, notes.value.length - 1)];
+      selectedNoteId.value = next?.id ?? null;
     }
   }
 }
 
+// ─── 添加TabBar显示的便签 ───
+function handleAddShowNote(id: string) {
+  addShowNote(id)
+}
+
+// ─── 移除TabBar显示的便签 ───
+function handleRemoveShowNote(id: string) {
+  removeShowNote(id)
+}
+
 // ─── 更新内容 ───
 function handleUpdate(id: string, content: string) {
-  updateNoteContent(id, content)
+  updateNoteContent(id, content);
 }
 
 // ─── 更改颜色 ───
-function handleColorChange(id: string, color: NoteItem['color']) {
-  setNoteColor(id, color)
+function handleColorChange(id: string, color: NoteItem["color"]) {
+  setNoteColor(id, color);
 }
 
 // ─── 快捷键 Ctrl+N 新建 ───
 function handleKeydown(event: KeyboardEvent) {
-  if ((event.ctrlKey || event.metaKey) && event.key === 'n') {
-    event.preventDefault()
-    handleAdd()
+  if ((event.ctrlKey || event.metaKey) && event.key === "n") {
+    event.preventDefault();
+    handleAdd();
   }
 }
 
 // ─── 生命周期 ───
 onMounted(async () => {
-  await loadNotes()
+  await loadNotes();
+  await loadShowNotes();
   if (notes.value.length > 0) {
-    selectedNoteId.value = notes.value[0].id
+    selectedNoteId.value = notes.value[0].id;
   }
-  window.addEventListener('keydown', handleKeydown)
-})
+  window.addEventListener("keydown", handleKeydown);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
-})
+  window.removeEventListener("keydown", handleKeydown);
+});
 </script>
 
 <template>
@@ -81,9 +103,9 @@ onUnmounted(() => {
     <NoteTabBar
       :notes="notes"
       :selected-note-id="selectedNoteId"
+      :show-notes-id="showNotesId"
       @select="selectNote"
       @close="handleClose"
-      @add="handleAdd"
     />
 
     <!-- 主内容区：侧边栏 + 编辑器 -->
@@ -91,7 +113,11 @@ onUnmounted(() => {
       <NoteSidebar
         :notes="notes"
         :selected-note-id="selectedNoteId"
+        :show-notes-id="showNotesId"
         @select="selectNote"
+        @add="handleAdd"
+        @add-show-note="handleAddShowNote"
+        @remove-show-note="handleRemoveShowNote"
       />
       <NoteEditor
         :note="selectedNote"

@@ -9,6 +9,7 @@ export interface NoteItem {
   createdAt: number
   updatedAt: number
 }
+export type ShowNoteItems = string[];
 
 export const NOTE_COLORS: NoteColor[] = ['yellow', 'pink', 'blue', 'green', 'purple', 'orange']
 export const DEFAULT_NOTE_COLOR: NoteColor = 'yellow'
@@ -47,6 +48,7 @@ export function getRelativeTime(timestamp: number): string {
 
 // ─── 模块级单例状态 ───
 const notes: Ref<NoteItem[]> = ref([])
+const showNotesId: Ref<string[]> = ref([])
 
 let initialized = false
 let saveTimer: ReturnType<typeof setTimeout> | null = null
@@ -63,9 +65,26 @@ function scheduleSave() {
   }, 300)
 }
 
+function scheduleShowSave() {
+  if (saveTimer) clearTimeout(saveTimer)
+  saveTimer = setTimeout(async () => {
+    try {
+      await window.ipcRenderer.invoke('save-show-notesId', JSON.stringify(showNotesId.value))
+    } catch (e) {
+      console.error('Save notes failed:', e)
+    }
+  }, 300)
+}
+
+
 // 监听变化，自动持久化
 watch(notes, () => {
   if (initialized) scheduleSave()
+}, { deep: true })
+
+watch(showNotesId, () => {
+  if (initialized) scheduleShowSave()
+    console.log(showNotesId.value);
 }, { deep: true })
 
 export function useNotes() {
@@ -122,12 +141,46 @@ export function useNotes() {
     }
   }
 
+  /** 从本地文件中加载上次在TabBar展示的便签 */
+  async function loadShowNotes() {
+    try {
+      const raw = await window.ipcRenderer.invoke('load-show-notesId')
+      if (raw) {
+        const parsed = JSON.parse(raw) as string[]
+        if (Array.isArray(parsed)) {
+          showNotesId.value = parsed
+        }
+      } else {
+        showNotesId.value = notes.value[0]?.id ? [notes.value[0].id] : []
+      }
+    } catch (e) {
+      console.error('Load show notes failed:', e)
+    }
+  }
+
+  /** 增加TabBar展示的便签 */
+  function addShowNote(id: string) {
+    if (!showNotesId.value.includes(id)) {
+      showNotesId.value.push(id)
+    }
+  }
+
+  /** 移除TabBar展示的便签 */
+  function removeShowNote(id: string) {
+    const idx = showNotesId.value.findIndex((n) => n === id)
+    if (idx !== -1) showNotesId.value.splice(idx, 1)
+  }
+
   return {
     notes,
+    showNotesId,
     addNote,
     deleteNote,
     updateNoteContent,
     setNoteColor,
     loadNotes,
+    loadShowNotes,
+    addShowNote,
+    removeShowNote,
   }
 }
