@@ -84,9 +84,10 @@ function handleClose(event: Event, id: string) {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 0 14px;
+  padding: 0 5px 0 10px;
   min-width: 80px;
   max-width: 160px;
+  min-height: 28px;
   border-radius: 8px 8px 0 0;
   background: var(--tab-color);
   cursor: pointer;
@@ -97,14 +98,15 @@ function handleClose(event: Event, id: string) {
   border: 1.5px solid transparent;
 
   &:hover {
-    filter: brightness(0.96);
+    filter: brightness(0.9);
   }
 
   &.active {
-    box-shadow: 0 -2px 6px color-mix(in srgb, var(--tab-color) 40%, transparent);
-    border-color: color-mix(in srgb, var(--tab-color) 60%, transparent);
-    border-bottom-color: transparent;
+    // box-shadow: 0 -2px 6px color-mix(in srgb, var(--tab-color) 40%, transparent);
+    // border-color: color-mix(in srgb, var(--tab-color) 60%, transparent);
+    // border-bottom-color: transparent;
     z-index: 1;
+    margin-top: -5px;
   }
 }
 

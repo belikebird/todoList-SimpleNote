@@ -41,6 +41,7 @@ function handleAdd() {
 function handleDelete(id: string) {
   if (!notes.value.some(note => note.id == id)) return
   deleteNote(id);
+  removeShowNote(id);
 }
 
 // ─── 移除展示的便签 ───
@@ -65,11 +66,6 @@ function handleClose(id: string) {
 function handleAddShowNote(id: string) {
   addShowNote(id)
   selectedNoteId.value = id;
-}
-
-// ─── 移除TabBar显示的便签 ───
-function handleRemoveShowNote(id: string) {
-  removeShowNote(id)
 }
 
 // ─── 更新内容 ───
@@ -124,7 +120,7 @@ onUnmounted(() => {
         @add="handleAdd"
         @delete="handleDelete"
         @add-show-note="handleAddShowNote"
-        @remove-show-note="handleRemoveShowNote"
+        @remove-show-note="handleClose"
       />
       <NoteEditor
         :note="selectedNote"
