@@ -136,7 +136,7 @@ onUnmounted(() => {
         @remove-show-note="handleClose"
       />
       <NoteEditor
-        :key="selectedNoteId"
+        :key="selectedNoteId ?? 'none'"
         :note="selectedNote"
         @update="handleUpdate"
         @change-color="handleColorChange"
