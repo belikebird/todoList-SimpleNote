@@ -21,13 +21,9 @@ const {
 const selectedNoteId = ref<string | null>(null);
 
 // 当前选中的便签
-// TODO: 1. 第一次打开便签时无内容显示BUG。2. 删除便签无效BUG。
 const selectedNote = computed<NoteItem | null>(() => {
   if (!selectedNoteId.value) return null;
-  const res = notes.value.find((n) => n.id === selectedNoteId.value) ?? null;
-  console.log(res);
-  
-  return res
+  return notes.value.find((n) => n.id === selectedNoteId.value) ?? null;
 });
 
 // ─── 选择便签 ───
@@ -43,9 +39,22 @@ function handleAdd() {
 }
 
 function handleDelete(id: string) {
-  if (!notes.value.some(note => note.id == id)) return
-  deleteNote(id);
+  const noteExists = notes.value.some(note => note.id === id)
+  if (!noteExists) return
+
+  // 先删除便签，再移除展示状态
   removeShowNote(id);
+  deleteNote(id);
+
+  // 如果删除的是当前选中的便签，需要重新选择
+  if (selectedNoteId.value === id) {
+    // 选择第一个可用的便签，如果没有则设为 null
+    if (notes.value.length > 0) {
+      selectedNoteId.value = notes.value[0].id;
+    } else {
+      selectedNoteId.value = null;
+    }
+  }
 }
 
 // ─── 移除展示的便签 ───
@@ -59,7 +68,7 @@ function handleClose(id: string) {
       selectedNoteId.value = null;
     } else {
       // 优先选后一个（idx 是删除前的位置）
-      const targetId = showNotesId.value[Math.min(idx, showNotesId.value.length - 1)]
+      const targetId = showNotesId.value[Math.min(idx, showNotesId.value.length - 1)];
       const nextNote = notes.value.find(note => note.id == targetId);
       selectedNoteId.value = nextNote?.id ?? null;
     }
@@ -127,6 +136,7 @@ onUnmounted(() => {
         @remove-show-note="handleClose"
       />
       <NoteEditor
+        :key="selectedNoteId"
         :note="selectedNote"
         @update="handleUpdate"
         @change-color="handleColorChange"

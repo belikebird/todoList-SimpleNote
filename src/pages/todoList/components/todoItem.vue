@@ -107,6 +107,9 @@ function cancelEdit() {
   &:hover {
     box-shadow: var(--shadow-hover);
     border-color: var(--border-hover);
+    .delete-btn {
+      opacity: 1;
+    }
   }
 
   &.finished {
@@ -189,8 +192,8 @@ function cancelEdit() {
 }
 
 .delete-btn {
-  width: 26px;
-  height: 26px;
+  width: 23px;
+  height: 23px;
   border: none;
   border-radius: 7px;
   background: transparent;

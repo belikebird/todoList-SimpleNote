@@ -65,20 +65,28 @@ const handleBlur = () => {
 }
 
 onMounted(() => {
-  if (editorRef.value && props.note && props.note.content) {
-    editorRef.value.innerText = props.note.content
+  if (editorRef.value && props.note) {
+    // 设置初始内容时，确保不会覆盖已存在的内容
+    if (editorRef.value.innerText !== props.note.content) {
+      editorRef.value.innerText = props.note.content || ''
+    }
   }
-  console.log('dwdwdw');
 })
 
 watch(() => props.note, (newNote) => {
   // 如果用户正在编辑，不覆盖内容
   if (isEditing) return
 
-  const newVal = newNote?.content
-  if (editorRef.value && newVal !== undefined && editorRef.value.innerText !== newVal) {
-    editorRef.value.innerText = newVal
-  }
+  // 必须无条件使用 nextTick，因为 v-if/v-else 切换时 DOM 尚未更新，
+  // 此时 editorRef.value 为 null，外层 if 会错误地跳过内容赋值
+  nextTick(() => {
+    if (editorRef.value && newNote) {
+      const newVal = newNote.content || ''
+      if (editorRef.value.innerText !== newVal) {
+        editorRef.value.innerText = newVal
+      }
+    }
+  })
 })
 
 // 切换便签时自动聚焦
@@ -123,10 +131,11 @@ watch(
       </div>
 
       <!-- 文本编辑区 -->
-      <div 
+      <div
       ref="editorRef"
-      class="editable" 
-      contenteditable="true" 
+      class="editable"
+      contenteditable="true"
+      spellcheck="false"
       data-placeholder="请输入内容..."
       @input="handleInput"
       @blur="handleBlur"

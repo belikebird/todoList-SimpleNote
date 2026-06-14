@@ -70,7 +70,7 @@ function handleClick(id: string) {
           <p class="note-time">{{ getRelativeTime(note.updatedAt) }}</p>
         </div>
         <!-- 删除便签按钮 -->
-        <button @click="emit('delete', note.id)" class="delete-btn">
+        <button @click.stop="emit('delete', note.id)" class="delete-btn">
           <svg
             t="1781310567117"
             class="icon"
@@ -185,6 +185,9 @@ function handleClick(id: string) {
 
   &:hover {
     background: var(--bg-surface-hover);
+    .delete-btn {
+      opacity: 1;
+    }
   }
 
   &.active {
@@ -245,7 +248,6 @@ function handleClick(id: string) {
   }
 
   &:hover {
-    opacity: 1;
     & svg path {
       fill: var(--danger);
     }

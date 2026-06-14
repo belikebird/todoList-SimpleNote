@@ -54,6 +54,7 @@ let saveTimer: ReturnType<typeof setTimeout> | null = null
 
 /** 防抖保存（300ms） */
 function scheduleSave() {
+
   if (saveTimer) clearTimeout(saveTimer)
   saveTimer = setTimeout(async () => {
     try {
@@ -119,6 +120,7 @@ export function useNotes() {
   function deleteNote(id: string) {
     const idx = notes.value.findIndex((n) => n.id === id)
     if (idx !== -1) notes.value.splice(idx, 1)
+    console.log('Deleted note', id)
   }
 
   /** 更新便签内容 */
@@ -149,7 +151,12 @@ export function useNotes() {
           showNotesId.value = parsed
         }
       } else {
-        showNotesId.value = notes.value[0]?.id ? [notes.value[0].id] : []
+        // 确保在加载完 notes 后再设置默认值
+        if (notes.value.length > 0) {
+          showNotesId.value = [notes.value[0].id]
+        } else {
+          showNotesId.value = []
+        }
       }
     } catch (e) {
       console.error('Load show notes failed:', e)

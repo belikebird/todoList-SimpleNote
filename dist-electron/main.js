@@ -48,6 +48,7 @@ ipcMain.handle("load-notes", () => {
 ipcMain.handle("save-notes", (_event, json) => {
   try {
     fs.writeFileSync(getNotesFilePath(), json, "utf-8");
+    console.log("ipcMain");
     return true;
   } catch (err) {
     console.error("[save-notes]", err);
